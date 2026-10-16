@@ -181,9 +181,10 @@
           ${renderPlayers(state.players, "ranking")}
         </section>`;
     }
-    const cards = orderedCards.map((card, index) => `<li class="order-card" draggable="true" data-card-id="${escapeHtml(card.id)}">
+    const cards = orderedCards.map((card, index) => `<li class="order-card" data-card-id="${escapeHtml(card.id)}">
       <span class="rank-number">${index + 1}</span>
       <span class="rank-copy">${escapeHtml(card.text)}</span>
+      <button class="drag-handle" type="button" data-drag-handle aria-label="Glisser pour déplacer ${escapeHtml(card.text)}"><span class="grip-dots" aria-hidden="true"></span></button>
       <span class="rank-actions">
         <button type="button" data-move="up" data-index="${index}" aria-label="Monter ${escapeHtml(card.text)}" ${index === 0 ? "disabled" : ""}>↑</button>
         <button type="button" data-move="down" data-index="${index}" aria-label="Descendre ${escapeHtml(card.text)}" ${index === orderedCards.length - 1 ? "disabled" : ""}>↓</button>
@@ -193,8 +194,9 @@
       <section class="game-panel">${renderProgress(1)}
         <h2>Du plus important au moins important</h2>
         <p class="room-subtitle">Réorganise les cartes pour que ton ordre te ressemble.</p>
-        <ol class="card-stack" id="rank-list">${cards}</ol>
-        <p class="rank-hint">Glisse les cartes pour les classer.</p>
+        <ol class="ranking-list" id="rank-list">${cards}</ol>
+        <p class="rank-hint">Déplace avec la poignée ou utilise les flèches.</p>
+        <p class="visually-hidden" id="rank-announcement" role="status" aria-live="polite"></p>
         <button class="button button-primary button-wide" type="button" data-action="submit-order">Valider mon ordre <span aria-hidden="true">→</span></button>
       </section>`;
   }
@@ -391,33 +393,50 @@
     let offsetX;
     let offsetY;
     let ghost;
-    let targetId;
+    let targetIndex = -1;
+    let insertAfter = false;
 
-    function finishDrag() {
+    function finishDrag(cancelled = false) {
       const fromIndex = ghost ? orderedCards.findIndex((card) => String(card.id) === sourceId) : -1;
-      const toIndex = ghost ? orderedCards.findIndex((card) => String(card.id) === targetId) : -1;
+      const dropIndex = targetIndex;
+      const dropAfter = insertAfter;
+      const shouldReorder = !cancelled && fromIndex >= 0 && dropIndex >= 0 && dropIndex !== fromIndex;
       ghost?.remove();
       ghost = undefined;
       dragInProgress = false;
       document.querySelector(".order-card.drag-source")?.classList.remove("drag-source");
       document.querySelector(".order-card.drop-target")?.classList.remove("drop-target");
-      if (fromIndex >= 0 && toIndex >= 0 && fromIndex !== toIndex) {
+      document.querySelector(".order-card.drop-before, .order-card.drop-after")
+        ?.classList.remove("drop-before", "drop-after");
+      if (shouldReorder) {
         const [card] = orderedCards.splice(fromIndex, 1);
-        orderedCards.splice(toIndex, 0, card);
+        let insertionIndex = dropIndex + (dropAfter ? 1 : 0);
+        if (insertionIndex > fromIndex) insertionIndex -= 1;
+        orderedCards.splice(insertionIndex, 0, card);
         renderState(activeState);
+        const movedIndex = orderedCards.findIndex((orderedCard) => String(orderedCard.id) === sourceId);
+        const movedItem = roomView.querySelectorAll(".order-card")[movedIndex];
+        movedItem?.querySelector("[data-drag-handle]")?.focus();
+        const announcement = roomView.querySelector("#rank-announcement");
+        if (announcement) announcement.textContent = `Carte déplacée à la position ${movedIndex + 1}.`;
       }
       pointerId = undefined;
       sourceId = undefined;
-      targetId = undefined;
+      targetIndex = -1;
+      insertAfter = false;
     }
 
     list.addEventListener("pointerdown", (event) => {
-      if (event.button !== 0 || event.target.closest("button")) return;
+      if (event.button !== 0) return;
+      const handle = event.target.closest("[data-drag-handle]");
+      if (!handle) return;
       const item = event.target.closest("[data-card-id]");
       if (!item) return;
+      event.preventDefault();
       const rect = item.getBoundingClientRect();
       pointerId = event.pointerId;
       sourceId = item.dataset.cardId;
+      handle.setPointerCapture(event.pointerId);
       startX = event.clientX;
       startY = event.clientY;
       offsetX = event.clientX - rect.left;
@@ -442,12 +461,21 @@
       ghost.style.top = `${event.clientY - offsetY}px`;
       ghost.style.transform = "scale(1.03) rotate(-1deg)";
       document.querySelector(".order-card.drop-target")?.classList.remove("drop-target");
-      const hovered = document.elementFromPoint(event.clientX, event.clientY)?.closest("[data-card-id]");
+      document.querySelector(".order-card.drop-before, .order-card.drop-after")
+        ?.classList.remove("drop-before", "drop-after");
+      const hovered = document.elementFromPoint(event.clientX, event.clientY)?.closest(".order-card");
       if (hovered && hovered.dataset.cardId !== sourceId) {
-        targetId = hovered.dataset.cardId;
-        hovered.classList.add("drop-target");
+        targetIndex = [...list.querySelectorAll(".order-card")].indexOf(hovered);
+        insertAfter = event.clientY > hovered.getBoundingClientRect().top + hovered.getBoundingClientRect().height / 2;
+        hovered.classList.add("drop-target", insertAfter ? "drop-after" : "drop-before");
       } else {
-        targetId = "";
+        targetIndex = -1;
+        insertAfter = false;
+      }
+      if (event.clientY < 56) {
+        window.scrollBy({ top: -12, behavior: "auto" });
+      } else if (event.clientY > window.innerHeight - 56) {
+        window.scrollBy({ top: 12, behavior: "auto" });
       }
     }, { passive: false, signal });
 
@@ -456,14 +484,7 @@
     }, { signal });
     window.addEventListener("pointercancel", (event) => {
       if (event.pointerId !== pointerId) return;
-      if (ghost) ghost.remove();
-      document.querySelector(".order-card.drag-source")?.classList.remove("drag-source");
-      document.querySelector(".order-card.drop-target")?.classList.remove("drop-target");
-      ghost = undefined;
-      dragInProgress = false;
-      pointerId = undefined;
-      sourceId = undefined;
-      targetId = undefined;
+      finishDrag(true);
     }, { signal });
   }
 
@@ -529,6 +550,10 @@
       if (nextIndex < 0 || nextIndex >= orderedCards.length) return;
       [orderedCards[index], orderedCards[nextIndex]] = [orderedCards[nextIndex], orderedCards[index]];
       renderState(activeState);
+      const movedItem = roomView.querySelectorAll(".order-card")[nextIndex];
+      movedItem?.querySelector(`[data-move="${moveButton.dataset.move}"]`)?.focus();
+      const announcement = roomView.querySelector("#rank-announcement");
+      if (announcement) announcement.textContent = `Carte déplacée à la position ${nextIndex + 1}.`;
       return;
     }
     const actionButton = event.target.closest("[data-action]");
