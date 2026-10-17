@@ -1,4 +1,12 @@
 /Graphism-view.png
 /prompt.txt
-/supabase
+/supabase/*
+!/supabase/migrations/
+/supabase/migrations/*
+!/supabase/migrations/*.sql
+!/supabase/*.sql
 /*.md
+node_modules
+.env
+.env.*
+!.env.example

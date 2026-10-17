@@ -1,84 +1,20 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="theme-color" content="#f6f5fc">
-    <meta name="description" content="Classez cinq cartes, devinez qui les a ordonnées et jouez entre amis.">
-    <title>Priorities — À toi de classer</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
-    <script src="./supabase-config.js" defer></script>
-    <script src="./app.js" defer></script>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#0f172a" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="manifest" href="/manifest.json" />
+    <title>Priorities</title>
   </head>
-  <body>
-    <main class="auth-screen" id="auth-screen">
-      <section class="auth-card" aria-labelledby="auth-title">
-        <a class="brand" href="./index.html" aria-label="Priorities, accueil">
-          <span class="brand-mark" aria-hidden="true">P</span>
-          <span>Priorities</span>
-        </a>
-        <p class="eyebrow">LE JEU DES PRIORITÉS</p>
-        <h1 id="auth-title">Tu les connais<br>vraiment ?</h1>
-        <p class="auth-copy">Classe. Devine. Révèle.</p>
-        <form id="login-form">
-          <label for="username">Nom</label>
-          <input id="username" name="username" type="text" autocomplete="username" placeholder="Ton pseudo" autocapitalize="none" required>
-          <label for="password">Mot de passe</label>
-          <input id="password" name="password" type="password" autocomplete="current-password" placeholder="Ton mot de passe" required>
-          <p class="feedback" id="login-feedback" role="alert" aria-live="polite" hidden></p>
-          <button class="button button-primary button-wide" type="submit">Jouer <span aria-hidden="true">→</span></button>
-        </form>
-      </section>
-    </main>
-
-    <div class="app-shell" id="app-shell" hidden>
-      <header class="topbar">
-        <a class="brand" href="./index.html" aria-label="Priorities, accueil">
-          <span class="brand-mark" aria-hidden="true">P</span>
-          <span>Priorities</span>
-        </a>
-        <div class="account-actions">
-          <span class="account-name" id="account-name"></span>
-          <button class="icon-button" id="sign-out" type="button" aria-label="Se déconnecter" title="Se déconnecter"><img class="ui-icon" src="./assets/arrow-right.svg" alt="" aria-hidden="true"></button>
-        </div>
-      </header>
-      <main class="page">
-        <p class="global-feedback" id="global-feedback" role="status" aria-live="polite" hidden></p>
-        <section class="home-view" id="home-view" hidden>
-          <div class="welcome-row">
-            <div>
-              <p class="eyebrow">À TOI DE JOUER</p>
-              <h1>Salut <span id="welcome-name">toi</span> <span class="heading-spark"></span></h1>
-            </div>
-            <div class="round-badge"><strong>5</strong><span>cartes<br>à classer</span></div>
-          </div>
-          <section class="home-card">
-            <div class="card-heading">
-              <span class="step-icon">01</span>
-              <div><h2>Nouvelle partie</h2></div>
-            </div>
-            <button class="button button-primary button-wide" id="create-room" type="button">Créer une salle <span aria-hidden="true">＋</span></button>
-          </section>
-          <section class="home-card join-card">
-            <div class="card-heading">
-              <span class="step-icon step-icon-soft">02</span>
-              <div><h2>Rejoindre une partie</h2></div>
-            </div>
-            <form class="join-form" id="join-form">
-              <label class="visually-hidden" for="room-code">Code de la salle</label>
-              <input id="room-code" name="room-code" type="text" placeholder="EX. A1B2C3" maxlength="6" autocapitalize="characters" autocomplete="off" required>
-              <button class="button button-dark" type="submit">Rejoindre <span aria-hidden="true">→</span></button>
-            </form>
-          </section>
-        </section>
-
-        <section class="room-view" id="room-view" hidden aria-live="polite"></section>
-      </main>
-    </div>
-    <noscript>Priorities nécessite JavaScript pour jouer.</noscript>
+  <body class="bg-slate-900 text-slate-100 antialiased overflow-hidden select-none">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

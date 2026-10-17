@@ -1,4 +1,0 @@
-window.PRIORITIES_SUPABASE_CONFIG = {
-  url: "https://aghewuqtqfvletyeocks.supabase.co",
-  anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFnaGV3dXF0cWZ2bGV0eWVvY2tzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIxNTU4MDcsImV4cCI6MjEwNzczMTgwN30.GW3rr0SMD7oFr7J24DHfiqOrsp_7aSXkEXQ7spW4FlQ"
-};
