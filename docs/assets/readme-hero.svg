@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="860" viewBox="0 0 1440 860" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="85" y1="30" x2="1320" y2="825" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#17132D"/>
+      <stop offset=".55" stop-color="#211638"/>
+      <stop offset="1" stop-color="#111827"/>
+    </linearGradient>
+    <linearGradient id="glow" x1="210" y1="110" x2="1190" y2="750" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#8B5CF6" stop-opacity=".36"/>
+      <stop offset=".55" stop-color="#EC4899" stop-opacity=".12"/>
+      <stop offset="1" stop-color="#22D3EE" stop-opacity=".14"/>
+    </linearGradient>
+    <linearGradient id="brand" x1="132" y1="157" x2="338" y2="225" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#A78BFA"/>
+      <stop offset="1" stop-color="#F0ABFC"/>
+    </linearGradient>
+    <linearGradient id="card" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#302648"/>
+      <stop offset="1" stop-color="#211C35"/>
+    </linearGradient>
+    <filter id="blur" x="0" y="0" width="1440" height="860" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
+      <feGaussianBlur stdDeviation="85"/>
+    </filter>
+    <filter id="shadow" x="730" y="145" width="630" height="640" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="28" stdDeviation="32" flood-color="#080611" flood-opacity=".45"/>
+    </filter>
+  </defs>
+  <rect width="1440" height="860" rx="36" fill="url(#bg)"/>
+  <g filter="url(#blur)" opacity=".72">
+    <circle cx="301" cy="326" r="185" fill="#7C3AED"/>
+    <circle cx="1080" cy="413" r="210" fill="#BE3B9A"/>
+    <circle cx="1244" cy="682" r="132" fill="#0891B2"/>
+  </g>
+  <rect width="1440" height="860" rx="36" fill="url(#glow)"/>
+  <rect x="1" y="1" width="1438" height="858" rx="35" stroke="#FFFFFF" stroke-opacity=".12" stroke-width="2"/>
+
+  <g opacity=".6" fill="#E9D5FF">
+    <circle cx="688" cy="145" r="2"/><circle cx="608" cy="680" r="2"/>
+    <circle cx="1327" cy="183" r="2"/><circle cx="1060" cy="105" r="1.5"/>
+    <circle cx="96" cy="569" r="1.5"/><circle cx="520" cy="798" r="2"/>
+  </g>
+  <path d="m591 208 5 13 13 5-13 5-5 13-5-13-13-5 13-5 5-13Z" fill="#F0ABFC" fill-opacity=".85"/>
+  <path d="m1336 584 4 10 10 4-10 4-4 10-4-10-10-4 10-4 4-10Z" fill="#67E8F9" fill-opacity=".85"/>
+
+  <g transform="translate(116 120)">
+    <rect width="54" height="54" rx="17" fill="url(#brand)"/>
+    <path d="m27 9 4.3 13.7L45 27l-13.7 4.3L27 45l-4.3-13.7L9 27l13.7-4.3L27 9Z" fill="white"/>
+  </g>
+  <text x="187" y="158" fill="#F8FAFC" font-family="Inter,Segoe UI,sans-serif" font-size="25" font-weight="750" letter-spacing=".2">PRIORITIES</text>
+  <text x="119" y="261" fill="#C4B5FD" font-family="Inter,Segoe UI,sans-serif" font-size="14" font-weight="750" letter-spacing="3.2">A REAL-TIME MULTIPLAYER PROJECT</text>
+  <text x="112" y="346" fill="#FFFFFF" font-family="Inter,Segoe UI,sans-serif" font-size="66" font-weight="800" letter-spacing="-2.8">A little closer</text>
+  <text x="112" y="424" fill="#FFFFFF" font-family="Inter,Segoe UI,sans-serif" font-size="66" font-weight="800" letter-spacing="-2.8">to what matters.</text>
+  <text x="117" y="490" fill="#D6D0E5" font-family="Inter,Segoe UI,sans-serif" font-size="21" font-weight="450">A shared digital space for meaningful</text>
+  <text x="117" y="523" fill="#D6D0E5" font-family="Inter,Segoe UI,sans-serif" font-size="21" font-weight="450">choices, connection, and discovery.</text>
+
+  <g transform="translate(118 609)">
+    <rect width="135" height="38" rx="19" fill="#FFFFFF" fill-opacity=".08" stroke="#FFFFFF" stroke-opacity=".14"/>
+    <circle cx="20" cy="19" r="4" fill="#A78BFA"/>
+    <text x="34" y="24" fill="#F5F3FF" font-family="Inter,Segoe UI,sans-serif" font-size="12" font-weight="650" letter-spacing=".7">REACT + TS</text>
+    <rect x="149" width="127" height="38" rx="19" fill="#FFFFFF" fill-opacity=".08" stroke="#FFFFFF" stroke-opacity=".14"/>
+    <circle cx="169" cy="19" r="4" fill="#67E8F9"/>
+    <text x="183" y="24" fill="#F5F3FF" font-family="Inter,Segoe UI,sans-serif" font-size="12" font-weight="650" letter-spacing=".7">SUPABASE</text>
+    <rect x="290" width="121" height="38" rx="19" fill="#FFFFFF" fill-opacity=".08" stroke="#FFFFFF" stroke-opacity=".14"/>
+    <circle cx="310" cy="19" r="4" fill="#F9A8D4"/>
+    <text x="324" y="24" fill="#F5F3FF" font-family="Inter,Segoe UI,sans-serif" font-size="12" font-weight="650" letter-spacing=".7">CAPACITOR</text>
+  </g>
+
+  <g filter="url(#shadow)" transform="rotate(5 1037 455)">
+    <rect x="826" y="188" width="419" height="544" rx="31" fill="#171326" fill-opacity=".88" stroke="#FFFFFF" stroke-opacity=".2" stroke-width="2"/>
+    <rect x="846" y="208" width="379" height="504" rx="23" fill="#18152A" stroke="#FFFFFF" stroke-opacity=".07"/>
+    <rect x="870" y="234" width="331" height="57" rx="16" fill="#FFFFFF" fill-opacity=".045"/>
+    <circle cx="894" cy="262" r="13" fill="#A78BFA" fill-opacity=".2"/>
+    <path d="m894 254 2.5 6.3 6.5 2.2-6.5 2.2-2.5 6.3-2.3-6.3-6.3-2.2 6.3-2.2 2.3-6.3Z" fill="#C4B5FD"/>
+    <text x="918" y="258" fill="#FFFFFF" font-family="Inter,Segoe UI,sans-serif" font-size="14" font-weight="750">YOUR SHARED SPACE</text>
+    <text x="918" y="276" fill="#A99FBF" font-family="Inter,Segoe UI,sans-serif" font-size="10" font-weight="500">A little perspective goes a long way</text>
+
+    <text x="873" y="328" fill="#A99FBF" font-family="Inter,Segoe UI,sans-serif" font-size="10" font-weight="700" letter-spacing="2">A FEW THINGS THAT MATTER</text>
+
+    <g>
+      <rect x="870" y="350" width="331" height="76" rx="17" fill="url(#card)" stroke="#C4B5FD" stroke-opacity=".23"/>
+      <rect x="886" y="367" width="43" height="42" rx="13" fill="#8B5CF6" fill-opacity=".19"/>
+      <text x="900" y="394" fill="#D8B4FE" font-family="Inter,Segoe UI,sans-serif" font-size="15" font-weight="750">01</text>
+      <text x="945" y="387" fill="#F8FAFC" font-family="Inter,Segoe UI,sans-serif" font-size="15" font-weight="650">Time with good people</text>
+      <text x="945" y="405" fill="#A99FBF" font-family="Inter,Segoe UI,sans-serif" font-size="11">The moments worth keeping</text>
+      <circle cx="1170" cy="389" r="4" fill="#C4B5FD"/>
+    </g>
+    <g>
+      <rect x="870" y="439" width="331" height="76" rx="17" fill="url(#card)" stroke="#67E8F9" stroke-opacity=".2"/>
+      <rect x="886" y="456" width="43" height="42" rx="13" fill="#0891B2" fill-opacity=".18"/>
+      <text x="900" y="483" fill="#67E8F9" font-family="Inter,Segoe UI,sans-serif" font-size="15" font-weight="750">02</text>
+      <text x="945" y="476" fill="#F8FAFC" font-family="Inter,Segoe UI,sans-serif" font-size="15" font-weight="650">Room to grow</text>
+      <text x="945" y="494" fill="#A99FBF" font-family="Inter,Segoe UI,sans-serif" font-size="11">Always something new to learn</text>
+      <circle cx="1170" cy="478" r="4" fill="#67E8F9"/>
+    </g>
+    <g>
+      <rect x="870" y="528" width="331" height="76" rx="17" fill="url(#card)" stroke="#F0ABFC" stroke-opacity=".2"/>
+      <rect x="886" y="545" width="43" height="42" rx="13" fill="#BE3B9A" fill-opacity=".19"/>
+      <text x="900" y="572" fill="#F0ABFC" font-family="Inter,Segoe UI,sans-serif" font-size="15" font-weight="750">03</text>
+      <text x="945" y="565" fill="#F8FAFC" font-family="Inter,Segoe UI,sans-serif" font-size="15" font-weight="650">A sense of adventure</text>
+      <text x="945" y="583" fill="#A99FBF" font-family="Inter,Segoe UI,sans-serif" font-size="11">Take the scenic route</text>
+      <circle cx="1170" cy="567" r="4" fill="#F0ABFC"/>
+    </g>
+
+    <rect x="870" y="624" width="331" height="55" rx="16" fill="url(#brand)"/>
+    <text x="938" y="658" fill="#FFFFFF" font-family="Inter,Segoe UI,sans-serif" font-size="14" font-weight="750" letter-spacing=".4">MADE TO BRING PEOPLE CLOSER</text>
+  </g>
+</svg>

@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { supabase, supabaseAuth, supabaseConfigurationError } from '../lib/supabase';
 import { useHaptics } from '../hooks/useHaptics';
-import { Sparkles, Users, PlusCircle, LogIn, LogOut } from 'lucide-react';
+import { Sparkles, Users, PlusCircle, LogIn, LogOut, Layers3, ListOrdered, Clock3, Eye, ArrowLeft } from 'lucide-react';
 import evaAvatar from '../assets/eva.webp';
 import noeAvatar from '../assets/noe.webp';
 import clementAvatar from '../assets/clement.png';
 import { ThemePicker } from '../components/ThemePicker';
-import type { AppTheme } from '../types/database.types';
+import type { AppTheme, RankingRevealMode } from '../types/database.types';
 
 interface HomeScreenProps {
   onGameJoined: (gameId: string, playerId: string, isHost: boolean) => void;
@@ -28,7 +28,11 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   onThemeChange,
 }) => {
   const [gameCode, setGameCode] = useState('');
-  const [mode, setMode] = useState<'menu' | 'join'>('menu');
+  const [mode, setMode] = useState<'menu' | 'join' | 'create'>('menu');
+  const [roundLimit, setRoundLimit] = useState(5);
+  const [cardCount, setCardCount] = useState(5);
+  const [rankingTimerSeconds, setRankingTimerSeconds] = useState(60);
+  const [rankingRevealMode, setRankingRevealMode] = useState<RankingRevealMode>('ALL');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const haptics = useHaptics();
@@ -65,7 +69,15 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
       for (let attempt = 0; attempt < 5; attempt++) {
         const { data, error: gameError } = await supabase
           .from('games')
-          .insert([{ code: generateCode(), status: 'LOBBY', round_number: 1 }])
+          .insert([{
+            code: generateCode(),
+            status: 'LOBBY',
+            round_number: 1,
+            round_limit: roundLimit,
+            card_count: cardCount,
+            ranking_timer_seconds: rankingTimerSeconds,
+            ranking_reveal_mode: rankingRevealMode,
+          }])
           .select()
           .single();
 
@@ -174,7 +186,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   };
 
   return (
-    <div className="home-screen flex flex-col h-full max-w-md mx-auto p-6 justify-between select-none">
+    <div className={`home-screen flex flex-col h-full max-w-md mx-auto p-6 justify-between select-none ${mode === 'create' ? 'home-screen-configuring' : ''}`}>
       <div className="home-theme-picker">
         <ThemePicker theme={theme} onThemeChange={onThemeChange} />
       </div>
@@ -182,7 +194,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         <span>Connecté en tant que {username}</span>
         <button type="button" onClick={() => void handleSignOut()} aria-label="Se déconnecter">
           <LogOut aria-hidden="true" />
-          <span>Déconnexion</span>
         </button>
       </div>
       <div className="home-hero flex flex-col items-center mt-8 space-y-3 text-center">
@@ -192,6 +203,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         <h1 className="text-3xl font-black bg-gradient-to-r from-indigo-600 via-pink-600 to-purple-600 bg-clip-text text-transparent">
           Priorities
         </h1>
+        {mode === 'create' && <p className="home-hero-subtitle">Ta partie, tes règles</p>}
         <div className="home-avatars" aria-hidden="true">
           <img src={evaAvatar} alt="" />
           <img src={noeAvatar} alt="" />
@@ -214,7 +226,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         {mode === 'menu' ? (
           <div className="space-y-3 pt-2">
             <button
-              onClick={handleCreateGame}
+              onClick={() => { setMode('create'); setError(null); haptics.lightTap(); }}
               disabled={loading || Boolean(supabaseConfigurationError)}
               className="home-primary w-full py-4 bg-gradient-to-r from-indigo-600 to-purple-600 active:opacity-90 text-white font-bold rounded-xl shadow-md flex items-center justify-center space-x-2 transition-transform active:scale-98"
             >
@@ -230,6 +242,92 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
               <LogIn className="w-5 h-5 text-indigo-600" />
               <span>Rejoindre avec un code</span>
             </button>
+          </div>
+        ) : mode === 'create' ? (
+          <div className="game-settings">
+            <header className="game-settings-header">
+              <button
+                type="button"
+                className="game-settings-back"
+                onClick={() => { setMode('menu'); setError(null); haptics.lightTap(); }}
+                aria-label="Retour au menu"
+              >
+                <ArrowLeft aria-hidden="true" />
+              </button>
+              <div>
+                <span className="game-settings-kicker">NOUVELLE PARTIE</span>
+                <h2>Configure ta partie</h2>
+                <p className="game-settings-description">Choisis le rythme et les règles de votre session.</p>
+              </div>
+            </header>
+
+            <label className="game-setting game-setting-card game-setting-menu">
+              <span className="game-setting-title"><Layers3 aria-hidden="true" /><span>Nombre de manches</span></span>
+              <select
+                value={roundLimit}
+                aria-label="Nombre de manches"
+                onChange={(event) => setRoundLimit(Number(event.target.value))}
+              >
+                {Array.from({ length: 20 }, (_, index) => index + 1).map((count) => (
+                  <option key={count} value={count}>{count} {count === 1 ? 'manche' : 'manches'}</option>
+                ))}
+              </select>
+            </label>
+
+            <label className="game-setting game-setting-card game-setting-menu">
+              <span className="game-setting-title"><ListOrdered aria-hidden="true" /><span>Cartes par manche</span></span>
+              <select
+                value={cardCount}
+                aria-label="Nombre de cartes par manche"
+                onChange={(event) => setCardCount(Number(event.target.value))}
+              >
+                {Array.from({ length: 8 }, (_, index) => index + 3).map((count) => (
+                  <option key={count} value={count}>{count} cartes</option>
+                ))}
+              </select>
+            </label>
+
+            <label className="game-setting game-setting-card game-setting-menu">
+              <span className="game-setting-title"><Clock3 aria-hidden="true" /><span>Temps pour classer</span></span>
+              <select
+                id="ranking-timer"
+                value={rankingTimerSeconds}
+                aria-label="Temps pour classer"
+                onChange={(event) => setRankingTimerSeconds(Number(event.target.value))}
+              >
+                <option value={0}>Sans limite</option>
+                <option value={30}>30 s</option>
+                <option value={60}>1 min</option>
+                <option value={90}>1 min 30 s</option>
+                <option value={120}>2 min</option>
+              </select>
+            </label>
+
+            <label className="game-setting game-setting-card game-setting-menu">
+              <span className="game-setting-title"><Eye aria-hidden="true" /><span>Révélation des classements</span></span>
+              <select
+                value={rankingRevealMode}
+                onChange={(event) => {
+                  const value = event.target.value;
+                  if (value === 'ALL' || value === 'ONE_BY_ONE') setRankingRevealMode(value);
+                }}
+              >
+                <option value="ALL">Tous ensemble</option>
+                <option value="ONE_BY_ONE">Un par un</option>
+              </select>
+            </label>
+
+            <p className="game-settings-note">À la fin du temps, le classement en cours est envoyé automatiquement.</p>
+
+            <button
+              onClick={() => void handleCreateGame()}
+              disabled={loading || Boolean(supabaseConfigurationError)}
+              className="home-primary w-full py-4 bg-gradient-to-r from-indigo-600 to-purple-600 active:opacity-90 text-white font-bold rounded-xl shadow-md flex items-center justify-center space-x-2 transition-transform active:scale-98"
+            >
+              <PlusCircle className="w-5 h-5" />
+              <span>{loading ? 'Création...' : 'Créer le salon'}</span>
+            </button>
+
           </div>
         ) : (
           <div className="space-y-3 pt-2">
@@ -267,9 +365,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         )}
       </div>
 
-      <div className="text-center text-[11px] text-slate-400 pb-[env(safe-area-inset-bottom)]">
-        Inspiré du jeu de société original • Multi-joueurs en temps réel
-      </div>
     </div>
   );
 };

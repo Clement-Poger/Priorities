@@ -3,10 +3,11 @@ import { supabase } from '../lib/supabase';
 export async function ensureRoundWithCards(
   gameId: string,
   roundIndex: number,
-  cardIds: string[]
+  cardIds: string[],
+  expectedCardCount: number
 ): Promise<string> {
-  if (cardIds.length !== 5) {
-    throw new Error('Un round doit contenir exactement cinq cartes.');
+  if (cardIds.length !== expectedCardCount) {
+    throw new Error(`Un round doit contenir exactement ${expectedCardCount} cartes.`);
   }
 
   const { data: existingRound, error: existingRoundError } = await supabase
@@ -44,7 +45,7 @@ export async function ensureRoundWithCards(
       }))
     );
     if (insertError) throw insertError;
-  } else if (existingRoundCards.length !== 5) {
+  } else if (existingRoundCards.length !== expectedCardCount) {
     throw new Error('Le round contient un nombre incomplet de cartes associées.');
   }
 

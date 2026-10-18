@@ -1,0 +1,38 @@
+Général:
+- le scroll vertical doit être autorisé pour permettre aux téléphones les plus petits de pouvoir voir les réponses des autres.
+- La zone de fond ne fait que la largeur minimale (dans la plupart des screens) à la place de prendre l'écran complet (Comme la home page).
+- Retire le footer partout où il est: "Inspiré du jeu de société original - Multi-joueurs en temps réel".
+- Retire les mentions "Ordre" pour un meilleur mot.
+
+Theme:
+- Le menu theme n'affiche pas l'option choisi pour ne garder que l'icone de palette.
+- Les Thèmes changent de noms pour Bleu, Vert, Violet et Rouge.
+
+Home page:
+- Elle est parfaite, ne change rien.
+
+Lobby Page:
+- Dans celui ci, pour pouvons voir que le bloc fermer/jouer à un fond violet qu'il faut passer en transparent.
+- La même chose doit être fait pour le bloc des joueurs.
+- Afin de clean le bloc fermer/jouer:
+    - Simplifie le texte de Jouer quand il y est écrit en attente à "En Attente", l'icone toujours à gauche.
+    - Le bouton Fermer lui doit accueillir l'icone à gauche et non plus en haut.
+    - Enfin, équilibre les deux boutons en leur donnant à chacun la meme largeur.
+
+Ranking Cards Page:
+- Quand un joueur valide sa série, tous les joueurs connectés se font refresh. Par conséquent, change cela sans casser les mécaniques en place.
+
+Systeme d'ame soeur:
+- On ne fait plus le détail des liaisons et le système de point est supprimé.
+- On affiche juste à chaque joueur un par un (et chacun gère son reveal perso) le pourcentage d'Ames Soeurs.
+    Formule:
+        - Si un choix est à 2 d'écart exactement: (1/4)*(1/{nombre de cartes})
+        - Si un choix est à 1 d'écart exactement: (1/2)*(1/{nombre de cartes})
+        - Si un choix est au même endroit exactement: (1/{nombre de cartes})
+    Le tout s'exprime en pourcentage. Exemple:
+        - Si un choix est à 2 d'écart, un autre à 1 d'écart et un autre au même endroit:
+            Les joueurs en question obtiennent donc 35% de compatibilités pour 5 Cartes
+                                                 et 44% de compatibilités pour 4 Cartes
+
+Fin de Round:
+- Quand l'option "Lancer le round suivant s'affiche, il faut proposer aussi une option pour revenir au lobby.

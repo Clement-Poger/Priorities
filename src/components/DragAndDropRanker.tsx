@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { GripVertical } from 'lucide-react';
 
@@ -12,6 +12,8 @@ interface Props {
   onSubmitRanking: (rankedIds: string[]) => void;
   isSubmitting?: boolean;
   error?: string | null;
+  timerExpiresAt?: number | null;
+  timerDurationSeconds: number;
 }
 
 export const DragAndDropRanker: React.FC<Props> = ({
@@ -19,12 +21,43 @@ export const DragAndDropRanker: React.FC<Props> = ({
   onSubmitRanking,
   isSubmitting = false,
   error,
+  timerExpiresAt = null,
+  timerDurationSeconds,
 }) => {
   const [items, setItems] = useState<CardItem[]>(cards);
+  const [secondsRemaining, setSecondsRemaining] = useState<number | null>(null);
+  const [timerProgress, setTimerProgress] = useState(100);
+  const autoSubmitTriggered = useRef(false);
 
   useEffect(() => {
     setItems(cards);
   }, [cards]);
+
+  useEffect(() => {
+    if (timerExpiresAt === null) {
+      setSecondsRemaining(null);
+      return;
+    }
+
+    const updateTimer = () => {
+      const remainingMilliseconds = Math.max(0, timerExpiresAt - Date.now());
+      const remaining = Math.ceil(remainingMilliseconds / 1000);
+      setSecondsRemaining(remaining);
+      setTimerProgress(
+        timerDurationSeconds > 0
+          ? Math.min(100, (remainingMilliseconds / (timerDurationSeconds * 1000)) * 100)
+          : 0
+      );
+      if (remaining === 0 && !isSubmitting && !autoSubmitTriggered.current) {
+        autoSubmitTriggered.current = true;
+        onSubmitRanking(items.map((item) => item.id));
+      }
+    };
+
+    updateTimer();
+    const intervalId = window.setInterval(updateTimer, 100);
+    return () => window.clearInterval(intervalId);
+  }, [isSubmitting, items, onSubmitRanking, timerDurationSeconds, timerExpiresAt]);
 
   const handleDragEnd = (result: { destination?: { index: number } | null; source: { index: number } }) => {
     if (!result.destination) return;
@@ -48,7 +81,25 @@ export const DragAndDropRanker: React.FC<Props> = ({
     <div className="ranking-screen flex flex-col h-full max-w-md mx-auto p-4 select-none">
       <div className="ranking-heading mb-4 text-center">
         <h2 className="text-xl font-bold text-slate-800">Classe tes priorités</h2>
-        <p className="text-xs text-slate-500">Glisse de 1 (Préféré) en haut à 5 (Moins aimé) en bas</p>
+        <p className="text-xs text-slate-500">Glisse de 1 (Préféré) en haut à {cards.length} (Moins aimé) en bas</p>
+        {secondsRemaining !== null && (
+          <div
+            className={`ranking-timer ${secondsRemaining <= 10 ? 'ranking-timer-urgent' : ''}`}
+            role="progressbar"
+            aria-label="Temps restant pour classer"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={Math.round(timerProgress)}
+            aria-valuetext={secondsRemaining > 0
+              ? `${Math.floor(secondsRemaining / 60)}:${String(secondsRemaining % 60).padStart(2, '0')} restantes`
+              : 'Temps écoulé, enregistrement du classement'}
+          >
+            <span
+              className="ranking-timer-progress"
+              style={{ width: `${timerProgress}%` }}
+            />
+          </div>
+        )}
       </div>
 
       <DragDropContext onDragEnd={handleDragEnd}>

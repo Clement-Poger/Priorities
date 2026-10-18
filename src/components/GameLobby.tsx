@@ -1,13 +1,18 @@
 import React from 'react';
 import { PlayerCard } from './PlayerCard';
-import { Play, Copy, Share2, Sparkles, X, RefreshCw } from 'lucide-react';
-import type { Player } from '../types/database.types';
+import { Play, Copy, Share2, Sparkles, X, RefreshCw, Layers3, ListOrdered, Clock3, Eye } from 'lucide-react';
+import type { Player, RankingRevealMode } from '../types/database.types';
 
 interface GameLobbyProps {
   code: string;
   players: Player[];
   currentPlayerId: string;
   isHost: boolean;
+  canStartGame: boolean;
+  roundLimit: number;
+  cardCount: number;
+  rankingTimerSeconds: number;
+  rankingRevealMode: RankingRevealMode;
   onStartGame: () => void;
   onCloseLobby: () => void;
   onRefresh: () => void;
@@ -23,6 +28,11 @@ export const GameLobby: React.FC<GameLobbyProps> = ({
   players,
   currentPlayerId,
   isHost,
+  canStartGame,
+  roundLimit,
+  cardCount,
+  rankingTimerSeconds,
+  rankingRevealMode,
   onStartGame,
   onCloseLobby,
   onRefresh,
@@ -33,6 +43,13 @@ export const GameLobby: React.FC<GameLobbyProps> = ({
   closeError,
 }) => {
   const [shareError, setShareError] = React.useState<string | null>(null);
+  const timerLabel = rankingTimerSeconds === 0
+    ? 'Sans limite'
+    : rankingTimerSeconds < 60
+      ? `${rankingTimerSeconds} s`
+    : rankingTimerSeconds % 60 === 0
+      ? `${rankingTimerSeconds / 60} min`
+      : `${Math.floor(rankingTimerSeconds / 60)} min ${rankingTimerSeconds % 60} s`;
 
   const copyCode = async () => {
     setShareError(null);
@@ -77,11 +94,29 @@ export const GameLobby: React.FC<GameLobbyProps> = ({
           <p className="text-xs font-medium uppercase tracking-widest text-indigo-200">
             Code du Salon
           </p>
-          <div className="text-4xl font-black font-mono tracking-widest bg-white/10 py-2 px-4 rounded-xl backdrop-blur-xs border border-white/20 inline-block">
+          <div className="lobby-room-code text-4xl font-black font-mono tracking-widest bg-white/10 py-2 px-4 rounded-xl backdrop-blur-xs border border-white/20 inline-block">
             {code}
           </div>
+          <div className="lobby-game-settings" aria-label="Configuration de la partie">
+            <div className="lobby-game-setting">
+              <Layers3 aria-hidden="true" />
+              <span>{roundLimit} manche{roundLimit > 1 ? 's' : ''}</span>
+            </div>
+            <div className="lobby-game-setting">
+              <ListOrdered aria-hidden="true" />
+              <span>{cardCount} carte{cardCount > 1 ? 's' : ''} par manche</span>
+            </div>
+            <div className="lobby-game-setting">
+              <Clock3 aria-hidden="true" />
+              <span>{timerLabel}</span>
+            </div>
+            <div className="lobby-game-setting">
+              <Eye aria-hidden="true" />
+              <span>{rankingRevealMode === 'ALL' ? 'Tous ensemble' : 'Un par un'}</span>
+            </div>
+          </div>
           
-          <div className="flex justify-center space-x-2 pt-1">
+          <div className="lobby-share-actions flex justify-center space-x-2 pt-1">
             <button
               onClick={copyCode}
               className="lobby-share-button flex items-center space-x-1.5 bg-white/20 hover:bg-white/30 text-xs px-3 py-1.5 rounded-lg font-medium transition-colors active:scale-95"
@@ -143,8 +178,9 @@ export const GameLobby: React.FC<GameLobbyProps> = ({
         {isHost ? (
           <div className="lobby-footer-actions">
             <button
+              type="button"
               onClick={onStartGame}
-              disabled={players.length < 2 || isStarting || isClosing}
+              disabled={players.length < 2 || !canStartGame || isStarting || isClosing}
               className={`lobby-launch-button w-full py-4 rounded-xl font-bold text-white shadow-lg flex items-center justify-center space-x-2 transition-all active:scale-98 ${
                 players.length >= 2
                   ? 'bg-gradient-to-r from-emerald-500 to-teal-600 hover:opacity-95'
@@ -153,9 +189,11 @@ export const GameLobby: React.FC<GameLobbyProps> = ({
             >
               <Play className="w-5 h-5 fill-current" />
               <span>
-                {players.length >= 2
+                {!canStartGame
+                  ? 'Manches terminées'
+                  : players.length >= 2
                   ? isStarting ? 'Démarrage...' : 'Lancer la Partie'
-                  : 'En attente de joueurs (min. 2)...'}
+                  : 'En Attente'}
               </span>
             </button>
             <button

@@ -1,5 +1,53 @@
 @import "tailwindcss";
 
+@property --theme-primary {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #a86df5;
+}
+
+@property --theme-secondary {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #eb67b6;
+}
+
+@property --theme-accent {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #68dfe0;
+}
+
+@property --theme-page {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #100c20;
+}
+
+@property --theme-surface {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #282039;
+}
+
+@property --theme-surface-raised {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #352747;
+}
+
+@property --theme-text {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #f6efff;
+}
+
+@property --theme-muted {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #b9accb;
+}
+
 :root {
   color-scheme: light;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -26,7 +74,28 @@
   --theme-surface-raised: #352747;
   --theme-text: #f6efff;
   --theme-muted: #b9accb;
+  --theme-background: linear-gradient(
+    155deg,
+    var(--theme-surface),
+    color-mix(in srgb, var(--theme-page) 85%, var(--theme-secondary)) 58%,
+    var(--theme-page)
+  );
+  transition:
+    --theme-primary 350ms ease,
+    --theme-secondary 350ms ease,
+    --theme-accent 350ms ease,
+    --theme-page 350ms ease,
+    --theme-surface 350ms ease,
+    --theme-surface-raised 350ms ease,
+    --theme-text 350ms ease,
+    --theme-muted 350ms ease;
   --app-height: 100dvh;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    transition: none;
+  }
 }
 
 :root[data-theme="ocean"] {
@@ -78,6 +147,7 @@
 }
 
 .theme-picker {
+  position: relative;
   display: inline-flex;
   min-height: 2rem;
   align-items: center;
@@ -98,13 +168,23 @@
   color: var(--theme-accent);
 }
 
+.theme-picker > span {
+  display: none;
+}
+
 .theme-picker select {
-  max-width: 6.5rem;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  max-width: none;
   border: 0;
-  background: transparent;
-  color: inherit;
-  font: inherit;
+  opacity: 0;
   cursor: pointer;
+}
+
+.theme-picker:focus-within {
+  outline: 2px solid var(--theme-accent);
+  outline-offset: 2px;
 }
 
 .theme-picker option {
@@ -123,9 +203,8 @@
 }
 
 .app-header .theme-picker select {
-  width: 5.5rem;
-  max-width: 5.5rem;
-  font-size: 0.62rem;
+  width: 100%;
+  max-width: none;
 }
 
 .home-theme-picker {
@@ -133,6 +212,17 @@
   z-index: 2;
   top: max(0.75rem, env(safe-area-inset-top));
   right: 1rem;
+}
+
+.home-theme-picker .theme-picker {
+  width: 3rem;
+  min-height: 3rem;
+  justify-content: center;
+}
+
+.home-theme-picker .theme-picker svg {
+  width: 1.25rem;
+  height: 1.25rem;
 }
 
 .connections-screen,
@@ -344,6 +434,72 @@
   transition: width 420ms cubic-bezier(0.2, 0.7, 0.25, 1);
 }
 
+.affinity-reveal-list {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.affinity-result-card {
+  display: flex;
+  min-height: 3.5rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.8rem 1rem;
+  border: 1px solid color-mix(in srgb, var(--theme-primary) 25%, transparent);
+  border-radius: 0.95rem;
+  background: color-mix(in srgb, var(--theme-surface) 90%, transparent);
+  color: var(--theme-text);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.affinity-result-card strong {
+  color: var(--theme-accent);
+  font-size: 1.2rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.order-reveal-screen > .theme-primary-button,
+.order-reveal-screen > .theme-next-button {
+  width: 100%;
+  flex: 0 0 auto;
+}
+
+.theme-primary-button:disabled,
+.theme-next-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+.results-actions {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.results-actions > button {
+  width: 100%;
+}
+
+.theme-secondary-button {
+  display: inline-flex;
+  min-height: 3.15rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0.8rem 1.1rem;
+  border: 1px solid color-mix(in srgb, var(--theme-primary) 35%, transparent);
+  border-radius: 0.95rem;
+  background: color-mix(in srgb, var(--theme-surface) 88%, transparent);
+  color: var(--theme-text);
+  font-size: 0.85rem;
+  font-weight: 850;
+}
+
+.theme-secondary-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
 .revealed-item {
   overflow: hidden;
   border: 1px solid color-mix(in srgb, var(--theme-primary) 24%, transparent);
@@ -543,8 +699,8 @@
   }
 
   .app-header .theme-picker select {
-    width: 4.5rem;
-    max-width: 4.5rem;
+    width: 100%;
+    max-width: none;
   }
 
   .connection-card {
@@ -628,7 +784,6 @@ body,
 
 html,
 body {
-  max-height: 100%;
   overflow: hidden;
   overflow-x: clip;
   overscroll-behavior: none;
@@ -689,6 +844,7 @@ button:not(:disabled):active {
 }
 
 .app-header {
+  height: 6vh;
   position: relative;
   background: linear-gradient(110deg, var(--theme-page), var(--theme-surface) 58%, color-mix(in srgb, var(--theme-secondary) 35%, var(--theme-page)));
   border-bottom: 1px solid rgb(222 197 255 / 12%);
@@ -707,14 +863,10 @@ button:not(:disabled):active {
 }
 
 .game-stage {
+  height: 94vh;
   position: relative;
   isolation: isolate;
-  background: linear-gradient(
-    145deg,
-    var(--theme-surface),
-    var(--theme-page) 54%,
-    color-mix(in srgb, var(--theme-primary) 12%, var(--theme-page))
-  );
+  background: var(--theme-background);
   transition: background 300ms ease;
 }
 
@@ -731,12 +883,7 @@ button:not(:disabled):active {
   padding-top: max(1.5rem, env(safe-area-inset-top));
   padding-bottom: max(1.1rem, env(safe-area-inset-bottom));
   color: #f8f4ff;
-  background: linear-gradient(
-    155deg,
-    var(--theme-surface),
-    color-mix(in srgb, var(--theme-page) 85%, var(--theme-secondary)) 58%,
-    var(--theme-page)
-  );
+  background: var(--theme-background);
   transition: background 300ms ease;
 }
 
@@ -756,6 +903,17 @@ button:not(:disabled):active {
   position: absolute;
   top: max(0.75rem, env(safe-area-inset-top));
   right: 1rem;
+}
+
+.auth-theme-picker .theme-picker {
+  width: 3rem;
+  min-height: 3rem;
+  justify-content: center;
+}
+
+.auth-theme-picker .theme-picker svg {
+  width: 1.5rem;
+  height: 1.5rem;
 }
 
 .auth-card {
@@ -894,10 +1052,13 @@ button:not(:disabled):active {
 
 .home-account {
   display: flex;
+  width: 100%;
   max-width: min(100%, 27rem);
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   gap: 0.5rem;
+  box-sizing: border-box;
+  padding-inline: 3.25rem;
   align-self: center;
   color: var(--theme-muted);
   font-size: 0.66rem;
@@ -911,21 +1072,24 @@ button:not(:disabled):active {
 }
 
 .home-account button {
+  position: absolute;
+  top: max(0.75rem, env(safe-area-inset-top));
+  left: 1rem;
   display: inline-flex;
   flex: 0 0 auto;
+  width: 3rem;
+  min-height: 3rem;
   align-items: center;
-  gap: 0.3rem;
-  padding: 0.35rem 0.5rem;
+  justify-content: center;
+  padding: 0.5rem;
   border: 1px solid color-mix(in srgb, var(--theme-text) 12%, transparent);
-  border-radius: 0.65rem;
+  border-radius: 0.85rem;
   color: var(--theme-muted);
-  font-size: 0.63rem;
-  font-weight: 750;
 }
 
 .home-account button svg {
-  width: 0.8rem;
-  height: 0.8rem;
+  width: 1.25rem;
+  height: 1.25rem;
 }
 
 .home-hero {
@@ -1026,10 +1190,6 @@ button:not(:disabled):active {
   background: rgb(206 166 255 / 10%);
 }
 
-.home-screen > div:last-child {
-  color: #8f82a5;
-}
-
 .home-content [role="alert"] {
   border-color: rgb(255 119 149 / 34%);
   background: rgb(125 36 67 / 25%);
@@ -1051,9 +1211,9 @@ button:not(:disabled):active {
 .room-card {
   position: relative;
   overflow: hidden;
-  border: 1px solid rgb(240 215 255 / 21%);
-  background-image: linear-gradient(130deg, #6941d1, #894fe4 58%, #b957d5);
-  box-shadow: 0 18px 42px rgb(81 35 152 / 34%), inset 0 1px rgb(255 255 255 / 18%);
+  border: 1px solid color-mix(in srgb, var(--theme-primary) 22%, transparent);
+  background: transparent;
+  box-shadow: none;
 }
 
 .room-card > * {
@@ -1145,7 +1305,7 @@ button:not(:disabled):active {
 
 .lobby-screen > div:last-child > div {
   border-color: rgb(225 203 255 / 14%);
-  background: rgb(41 31 59 / 92%);
+  background: transparent;
   color: #c9badb;
 }
 
@@ -1417,7 +1577,7 @@ button:not(:disabled):active {
   margin: 0.2rem 0 0;
   font-size: clamp(2.35rem, 10vw, 3.2rem);
   font-weight: 950;
-  letter-spacing: -0.065em;
+  letter-spacing: -0.02em;
   line-height: 1;
 }
 
@@ -1486,6 +1646,224 @@ button:not(:disabled):active {
   line-height: 1.45;
 }
 
+.game-settings {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.game-settings h2 {
+  margin: 0;
+  color: var(--theme-text);
+  font-size: 1.2rem;
+  font-weight: 900;
+  text-align: center;
+}
+
+.game-settings-description,
+.game-settings-note {
+  margin: 0;
+  color: var(--theme-muted);
+  font-size: 0.72rem;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.home-content .game-setting {
+  display: grid;
+  gap: 0.35rem;
+  color: var(--theme-text);
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.game-setting select {
+  width: 100%;
+  min-height: 2.7rem;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--theme-primary) 36%, transparent);
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--theme-page) 70%, transparent);
+  color: var(--theme-text);
+  font-size: 0.8rem;
+}
+
+.game-setting option {
+  background: var(--theme-surface);
+  color: var(--theme-text);
+}
+
+.home-screen-configuring {
+  justify-content: flex-start;
+  gap: 0.75rem;
+  padding-top: max(0.85rem, env(safe-area-inset-top));
+}
+
+.home-screen-configuring .home-account {
+  align-self: flex-end;
+}
+
+.home-screen-configuring .home-hero {
+  gap: 0.2rem;
+  margin-top: 0;
+}
+
+.home-screen-configuring .home-logo {
+  width: 3rem;
+  height: 3rem;
+  padding: 0.55rem;
+  border-radius: 1rem;
+}
+
+.home-screen-configuring .home-logo svg {
+  width: 1.9rem;
+  height: 1.9rem;
+}
+
+.home-screen-configuring .home-hero h1 {
+  font-size: 1.7rem;
+}
+
+.home-screen-configuring .home-avatars {
+  display: none;
+}
+
+.home-hero-subtitle {
+  margin: 0.1rem 0 0;
+  color: var(--theme-muted);
+  font-size: 0.7rem;
+  font-weight: 650;
+}
+
+.home-screen-configuring .home-content {
+  width: min(100%, 34rem);
+  margin: 0 auto;
+}
+
+.game-settings {
+  gap: 0.8rem;
+}
+
+.game-settings-header {
+  display: grid;
+  grid-template-columns: 2.5rem minmax(0, 1fr);
+  align-items: start;
+  gap: 0.75rem;
+  margin-bottom: 0.15rem;
+}
+
+.game-settings-header > div {
+  min-width: 0;
+}
+
+.game-settings-back {
+  display: grid !important;
+  width: 2.5rem !important;
+  min-height: 2.5rem !important;
+  place-items: center;
+  padding: 0 !important;
+  border: 1px solid color-mix(in srgb, var(--theme-text) 12%, transparent);
+  border-radius: 0.85rem !important;
+  background: color-mix(in srgb, var(--theme-surface) 78%, transparent);
+  color: var(--theme-text) !important;
+}
+
+.game-settings-back svg {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
+.game-settings-kicker {
+  color: var(--theme-accent);
+  font-size: 0.56rem;
+  font-weight: 900;
+  letter-spacing: 0.17em;
+}
+
+.game-settings-header h2 {
+  margin-top: 0.12rem;
+  font-size: 1.35rem;
+  text-align: left;
+}
+
+.game-settings-description {
+  margin-top: 0.22rem;
+  font-size: 0.68rem;
+  text-align: left;
+}
+
+.home-content .game-setting-card {
+  gap: 0.5rem;
+  padding: 0.85rem 0.95rem;
+  border: 1px solid color-mix(in srgb, var(--theme-primary) 22%, transparent);
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--theme-surface) 70%, transparent);
+  box-shadow: inset 0 1px color-mix(in srgb, var(--theme-text) 5%, transparent);
+}
+
+.game-setting-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--theme-text);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+.game-setting-title svg {
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 auto;
+  color: var(--theme-accent);
+}
+
+.home-content .game-setting-menu {
+  grid-template-columns: minmax(0, 1fr) minmax(7rem, 42%);
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.55rem 0.8rem;
+}
+
+.home-content .game-setting-menu select {
+  min-width: 0;
+  min-height: 2.35rem;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid color-mix(in srgb, var(--theme-primary) 26%, transparent);
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--theme-page) 72%, transparent);
+  color: var(--theme-text);
+  font-size: 0.73rem;
+}
+
+.game-settings-note {
+  padding: 0.2rem 0.35rem;
+  font-size: 0.64rem;
+}
+
+.home-screen-configuring .home-content > .game-settings > .home-primary {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  margin-top: 0.15rem;
+}
+
+.home-screen-configuring .home-content > .game-settings > button:last-child:not(.home-primary) {
+  min-height: 2.5rem;
+  padding: 0.3rem 0.5rem;
+  color: var(--theme-muted);
+  font-size: 0.72rem;
+}
+
+@media (max-height: 760px) {
+  .home-screen-configuring {
+    gap: 0.5rem;
+  }
+
+  .home-screen-configuring .home-hero {
+    display: none;
+  }
+}
+
 .home-content button {
   display: flex;
   width: 100%;
@@ -1514,18 +1892,10 @@ button:not(:disabled):active {
   font-size: 0.8rem;
 }
 
-.home-screen > div:last-child {
-  width: min(100%, 27rem);
-  align-self: center;
-  padding-bottom: env(safe-area-inset-bottom);
-  font-size: 0.68rem;
-  line-height: 1.5;
-}
-
 .app-header {
   z-index: 5;
   flex: 0 0 auto;
-  padding: env(safe-area-inset-top) 1rem 0.65rem;
+  padding: calc(env(safe-area-inset-top) + 0.325rem) 1rem 0.325rem;
 }
 
 .app-header-inner {
@@ -1598,10 +1968,15 @@ button:not(:disabled):active {
 
 .game-stage {
   display: flex;
+  width: 100%;
+  flex: 1 1 auto;
   min-width: 0;
   min-height: 0;
   flex-direction: column;
   overflow-x: clip;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 .player-card {
@@ -1668,15 +2043,58 @@ button:not(:disabled):active {
   text-transform: uppercase;
 }
 
-.room-card > div:nth-of-type(1) {
+.lobby-room-code {
   max-width: 100%;
   padding: 0.5rem 1rem;
   border-radius: 0.95rem;
+  border: 1px solid color-mix(in srgb, var(--theme-primary) 40%, transparent);
+  background: color-mix(in srgb, var(--theme-primary) 30%, var(--theme-surface));
   font-size: clamp(2rem, 9vw, 2.7rem);
   line-height: 1.15;
 }
 
-.room-card > div:nth-of-type(2) {
+.lobby-game-settings {
+  display: grid;
+  width: 100%;
+  max-width: 25rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin-top: 0.15rem;
+  padding: 0;
+}
+
+.lobby-game-setting {
+  display: flex;
+  min-width: 0;
+  min-height: 2.65rem;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.55rem;
+  padding: 0.58rem 0.7rem;
+  border: 1px solid color-mix(in srgb, var(--theme-primary) 25%, transparent);
+  border-radius: 0.85rem;
+  background: color-mix(in srgb, var(--theme-surface) 72%, transparent);
+  color: var(--theme-text);
+  text-align: left;
+}
+
+.lobby-game-setting svg {
+  width: 0.95rem;
+  height: 0.95rem;
+  flex: 0 0 auto;
+  color: var(--theme-accent);
+}
+
+.lobby-game-setting span {
+  overflow: hidden;
+  color: var(--theme-text);
+  font-size: 0.66rem;
+  font-weight: 750;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+}
+
+.lobby-share-actions {
   display: flex;
   justify-content: center;
   gap: 0.5rem;
@@ -1890,22 +2308,18 @@ button:not(:disabled):active {
 }
 
 .lobby-footer-actions {
-  display: flex;
-  align-items: stretch;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 0.65rem;
 }
 
-.lobby-footer-actions .lobby-launch-button {
+.lobby-footer-actions > button {
+  width: 100%;
   min-width: 0;
-  flex: 1 1 auto;
 }
 
 .lobby-footer-actions .lobby-close-button {
-  display: flex;
-  width: auto;
-  min-width: 4.75rem;
-  flex: 0 0 auto;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
   gap: 0.25rem;
@@ -1914,7 +2328,7 @@ button:not(:disabled):active {
   border-radius: 1rem;
   background: rgb(119 44 65 / 25%);
   color: #ffc1cc;
-  font-size: 0.65rem;
+  font-size: 0.72rem;
   font-weight: 800;
   transition: background 180ms ease, border-color 180ms ease, transform 180ms ease;
 }
@@ -1972,6 +2386,31 @@ button:not(:disabled):active {
   margin: 0.45rem 0 0;
   font-size: 0.75rem;
   line-height: 1.5;
+}
+
+.ranking-timer {
+  height: 0.45rem;
+  margin: 0.7rem 0 0;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--theme-text) 16%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--theme-text) 9%, transparent);
+}
+
+.ranking-timer-urgent {
+  border-color: rgb(255 130 156 / 45%);
+}
+
+.ranking-timer-progress {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--theme-primary), var(--theme-accent));
+  transition: width 100ms linear;
+}
+
+.ranking-timer-urgent .ranking-timer-progress {
+  background: #ff829c;
 }
 
 .ranking-list {
@@ -2215,8 +2654,17 @@ button:not(:disabled):active {
 }
 
 .room-card {
-  background-image: linear-gradient(130deg, var(--theme-primary), var(--theme-secondary));
+  background: transparent;
   transition: background 260ms ease;
+}
+
+.lobby-players,
+.lobby-players .player-card {
+  background: transparent;
+}
+
+.lobby-players .player-card {
+  box-shadow: none;
 }
 
 .player-card {
@@ -2232,6 +2680,12 @@ button:not(:disabled):active {
     color-mix(in srgb, var(--theme-primary) 34%, var(--theme-surface-raised)),
     var(--theme-surface-raised)
   );
+}
+
+.lobby-players .player-card,
+.lobby-players .player-card.player-current {
+  background: transparent;
+  box-shadow: none;
 }
 
 .ranking-item {
@@ -2483,10 +2937,13 @@ button:not(:disabled):active {
 
 .order-reveal-list {
   display: grid;
+  max-height: 55vh;
+  flex: 1 1 auto;
   min-height: 0;
   gap: 0.7rem;
   overflow-y: auto;
   overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
   padding: 0.1rem 0.2rem 0.5rem 0;
 }
 
@@ -2496,6 +2953,19 @@ button:not(:disabled):active {
   border-radius: 1rem;
   background: linear-gradient(140deg, var(--theme-surface-raised), var(--theme-surface));
   animation: rise-in 380ms ease both;
+}
+
+.ranking-reveal-menu .order-reveal-card {
+  padding: 1rem;
+  border-color: color-mix(in srgb, var(--theme-primary) 44%, transparent);
+  border-left-width: 4px;
+  background: color-mix(in srgb, var(--theme-surface-raised) 90%, transparent);
+  box-shadow: 0 10px 24px rgb(0 0 0 / 18%);
+}
+
+.ranking-reveal-menu .order-reveal-card h2 {
+  padding-bottom: 0.65rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--theme-primary) 24%, transparent);
 }
 
 .order-reveal-card h2 {

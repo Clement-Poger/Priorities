@@ -3,10 +3,10 @@ import { Palette } from 'lucide-react';
 import type { AppTheme } from '../types/database.types';
 
 const themeLabels: Record<AppTheme, string> = {
-  nebula: 'Nébuleuse',
-  ocean: 'Océan',
-  sunset: 'Crépuscule',
-  forest: 'Forêt',
+  ocean: 'Bleu',
+  forest: 'Vert',
+  nebula: 'Violet',
+  sunset: 'Rouge',
 };
 
 const isAppTheme = (value: string): value is AppTheme =>

@@ -39,7 +39,7 @@ export const GuessingScreen: React.FC<Props> = ({
   const orderedCards = (targetRanking?.ranking ?? [])
     .map((cardId) => cardsById.get(cardId))
     .filter((card): card is Pick<Card, 'id' | 'content'> => Boolean(card));
-  const cardsAreReady = Boolean(targetPlayer && orderedCards.length === 5);
+  const cardsAreReady = Boolean(targetPlayer && orderedCards.length === cards.length);
 
   useEffect(() => {
     let active = true;
@@ -101,7 +101,7 @@ export const GuessingScreen: React.FC<Props> = ({
     return (
       <section className="guess-screen">
         <p className="state-card" role="alert">
-          Votre ordre à deviner n’a pas encore été attribué. Actualisez la partie.
+          Votre classement à deviner n’a pas encore été attribué. Actualisez la partie.
         </p>
       </section>
     );
@@ -129,7 +129,7 @@ export const GuessingScreen: React.FC<Props> = ({
         ) : (
           <>
             <div className="loading-spinner" />
-            <p>Préparation de l’ordre à deviner...</p>
+            <p>Préparation du classement à deviner...</p>
           </>
         )}
       </section>
@@ -140,11 +140,11 @@ export const GuessingScreen: React.FC<Props> = ({
     <section className="guess-screen">
       <header className="guess-heading">
         <span className="screen-kicker">À toi de deviner</span>
-        <h1>Qui a fait cet ordre ?</h1>
+        <h1>Qui a fait ce classement ?</h1>
         <p>Un autre joueur a classé ces cartes. À toi de retrouver lequel.</p>
       </header>
 
-      <ol className="guess-order" aria-label="Ordre à deviner">
+      <ol className="guess-order" aria-label="Classement à deviner">
         {orderedCards.map((card, index) => (
           <li key={card.id} className="guess-order-item">
             <span className="guess-order-number">{index + 1}</span>
@@ -155,7 +155,7 @@ export const GuessingScreen: React.FC<Props> = ({
 
       <form className="guess-form" onSubmit={(event) => void submitGuess(event)}>
         <fieldset>
-          <legend>À qui appartient cet ordre ?</legend>
+          <legend>À qui appartient ce classement ?</legend>
           <div className="guess-candidates">
             {candidates.map((player) => (
               <label

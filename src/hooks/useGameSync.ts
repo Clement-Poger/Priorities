@@ -15,9 +15,9 @@ export function useGameSync(gameId: string, playerId: string) {
   const [players, setPlayers] = useState<Player[]>([]);
   const [currentRound, setCurrentRound] = useState<Round | null>(null);
   const [rankings, setRankings] = useState<PlayerRanking[]>([]);
-  const [roundReveal, setRoundReveal] = useState<RoundReveal | null>(null);
   const [roundGuess, setRoundGuess] = useState<RoundGuess | null>(null);
   const [roundGuesses, setRoundGuesses] = useState<RoundGuess[]>([]);
+  const [roundReveal, setRoundReveal] = useState<RoundReveal | null>(null);
   const [revealOrder, setRevealOrder] = useState<RoundRevealOrder[]>([]);
   const [roundProgress, setRoundProgress] = useState({ submittedCount: 0, guessedCount: 0 });
   const [syncError, setSyncError] = useState<string | null>(null);
@@ -26,6 +26,32 @@ export function useGameSync(gameId: string, playerId: string) {
   const requestSequence = useRef(0);
   const refreshInProgress = useRef(false);
   const refreshPending = useRef(false);
+  const refreshRankingData = useCallback(async (roundId: string) => {
+    try {
+      const [rankingsResult, progressResult] = await Promise.all([
+        supabase
+          .from('player_rankings')
+          .select('*')
+          .eq('round_id', roundId),
+        supabase.rpc('get_round_progress', { p_round_id: roundId }),
+      ]);
+      if (rankingsResult.error) throw rankingsResult.error;
+      if (progressResult.error) throw progressResult.error;
+      setRankings(rankingsResult.data);
+      setRoundProgress((current) => ({
+        ...current,
+        submittedCount: progressResult.data.submitted_count,
+      }));
+      setSyncError(null);
+    } catch (error) {
+      console.error('Erreur synchronisation des classements:', error);
+      setSyncError(
+        error instanceof Error
+          ? error.message
+          : 'Impossible de synchroniser les classements.'
+      );
+    }
+  }, []);
   currentRoundRef.current = currentRound;
 
   const refresh = useCallback(async () => {
@@ -59,51 +85,51 @@ export function useGameSync(gameId: string, playerId: string) {
 
           const latestRound = roundsResult.data[0] ?? null;
           let latestRankings: PlayerRanking[] = [];
-          let latestRoundReveal: RoundReveal | null = null;
           let latestRoundGuess: RoundGuess | null = null;
           let latestRoundGuesses: RoundGuess[] = [];
+          let latestRoundReveal: RoundReveal | null = null;
           let latestRevealOrder: RoundRevealOrder[] = [];
           let latestRoundProgress = { submittedCount: 0, guessedCount: 0 };
           if (latestRound) {
             const [
               rankingsResult,
-              revealResult,
               guessResult,
-              revealOrderResult,
               progressResult,
+              revealResult,
+              revealOrderResult,
             ] = await Promise.all([
               supabase
                 .from('player_rankings')
                 .select('*')
                 .eq('round_id', latestRound.id),
               supabase
+                .from('round_guesses')
+                .select('*')
+                .eq('round_id', latestRound.id),
+              supabase.rpc('get_round_progress', { p_round_id: latestRound.id }),
+              supabase
                 .from('round_reveals')
                 .select('*')
                 .eq('round_id', latestRound.id)
                 .maybeSingle(),
               supabase
-                .from('round_guesses')
-                .select('*')
-                .eq('round_id', latestRound.id),
-              supabase
                 .from('round_reveal_order')
                 .select('*')
                 .eq('round_id', latestRound.id)
                 .order('reveal_index', { ascending: true }),
-              supabase.rpc('get_round_progress', { p_round_id: latestRound.id }),
             ]);
             if (rankingsResult.error) throw rankingsResult.error;
-            if (revealResult.error) throw revealResult.error;
             if (guessResult.error) throw guessResult.error;
-            if (revealOrderResult.error) throw revealOrderResult.error;
             if (progressResult.error) throw progressResult.error;
+            if (revealResult.error) throw revealResult.error;
+            if (revealOrderResult.error) throw revealOrderResult.error;
             latestRankings = rankingsResult.data;
             latestRoundReveal = revealResult.data;
+            latestRevealOrder = revealOrderResult.data;
             latestRoundGuesses = guessResult.data;
             latestRoundGuess = latestRoundGuesses.find(
               (guess) => guess.guesser_player_id === playerId
             ) ?? null;
-            latestRevealOrder = revealOrderResult.data;
             latestRoundProgress = {
               submittedCount: progressResult.data.submitted_count,
               guessedCount: progressResult.data.guessed_count,
@@ -115,9 +141,9 @@ export function useGameSync(gameId: string, playerId: string) {
           setPlayers(playersResult.data);
           setCurrentRound(latestRound);
           setRankings(latestRankings);
-          setRoundReveal(latestRoundReveal);
           setRoundGuess(latestRoundGuess);
           setRoundGuesses(latestRoundGuesses);
+          setRoundReveal(latestRoundReveal);
           setRevealOrder(latestRevealOrder);
           setRoundProgress(latestRoundProgress);
           setSyncError(null);
@@ -165,19 +191,10 @@ export function useGameSync(gameId: string, playerId: string) {
             : 'round_id' in payload.old
               ? payload.old.round_id
               : null;
-        if (changedRoundId && changedRoundId === currentRoundRef.current?.id) {
+        if (changedRoundId && !currentRoundRef.current) {
           void refresh();
-        }
-      })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'round_reveals' }, (payload) => {
-        const changedRoundId =
-          'round_id' in payload.new
-            ? payload.new.round_id
-            : 'round_id' in payload.old
-              ? payload.old.round_id
-              : null;
-        if (changedRoundId && changedRoundId === currentRoundRef.current?.id) {
-          void refresh();
+        } else if (changedRoundId && changedRoundId === currentRoundRef.current?.id) {
+          void refreshRankingData(changedRoundId);
         }
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'round_guesses' }, (payload) => {
@@ -191,7 +208,7 @@ export function useGameSync(gameId: string, playerId: string) {
           void refresh();
         }
       })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'round_reveal_order' }, (payload) => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'round_reveals' }, (payload) => {
         const changedRoundId =
           'round_id' in payload.new
             ? payload.new.round_id
@@ -216,7 +233,7 @@ export function useGameSync(gameId: string, playerId: string) {
       requestSequence.current++;
       void supabase.removeChannel(channel);
     };
-  }, [gameId, refresh]);
+  }, [gameId, refresh, refreshRankingData]);
 
   useEffect(() => {
     if (!gameId || gameState?.status !== 'LOBBY') return;
@@ -236,9 +253,9 @@ export function useGameSync(gameId: string, playerId: string) {
     players,
     currentRound,
     rankings,
-    roundReveal,
     roundGuess,
     roundGuesses,
+    roundReveal,
     revealOrder,
     roundProgress,
     syncError,

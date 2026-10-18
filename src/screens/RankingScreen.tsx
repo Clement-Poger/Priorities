@@ -12,6 +12,8 @@ interface RankingScreenProps {
   players: Player[];
   rankings: PlayerRanking[];
   submittedCount: number;
+  rankingStartedAt: string | null;
+  rankingTimerSeconds: number;
 }
 
 export const RankingScreen: React.FC<RankingScreenProps> = ({
@@ -20,6 +22,8 @@ export const RankingScreen: React.FC<RankingScreenProps> = ({
   players,
   rankings,
   submittedCount,
+  rankingStartedAt,
+  rankingTimerSeconds,
 }) => {
   const [cards, setCards] = useState<Array<Pick<Card, 'id' | 'content'>>>([]);
   const [loading, setLoading] = useState(true);
@@ -63,7 +67,7 @@ export const RankingScreen: React.FC<RankingScreenProps> = ({
     return () => {
       active = false;
     };
-  }, [round]);
+  }, [round?.id]);
 
   useEffect(() => {
     const currentRanking = rankings.find((r) => r.player_id === playerId);
@@ -146,6 +150,12 @@ export const RankingScreen: React.FC<RankingScreenProps> = ({
       onSubmitRanking={handleSubmitRanking}
       isSubmitting={isSubmitting}
       error={submitError}
+      timerExpiresAt={
+        rankingStartedAt && rankingTimerSeconds > 0
+          ? new Date(rankingStartedAt).getTime() + rankingTimerSeconds * 1000
+          : null
+      }
+      timerDurationSeconds={rankingTimerSeconds}
     />
   );
 };

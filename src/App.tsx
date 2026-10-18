@@ -54,9 +54,9 @@ export const App: React.FC = () => {
     players,
     currentRound,
     rankings,
-    roundReveal,
     roundGuess,
     roundGuesses,
+    roundReveal,
     revealOrder,
     roundProgress,
     syncError,
@@ -182,6 +182,11 @@ export const App: React.FC = () => {
             players={players}
             currentPlayerId={session.playerId}
             isHost={session.isHost}
+            currentRoundIndex={currentRound?.round_index ?? 0}
+            roundLimit={gameState.round_limit}
+            cardCount={gameState.card_count}
+            rankingTimerSeconds={gameState.ranking_timer_seconds}
+            rankingRevealMode={gameState.ranking_reveal_mode}
             onRefresh={refresh}
             onLobbyClosed={() => setSession(null)}
           />
@@ -194,6 +199,8 @@ export const App: React.FC = () => {
             players={players}
             rankings={rankings}
             submittedCount={roundProgress.submittedCount}
+            rankingStartedAt={gameState.ranking_started_at}
+            rankingTimerSeconds={gameState.ranking_timer_seconds}
           />
         )}
 
@@ -213,20 +220,23 @@ export const App: React.FC = () => {
             gameId={session.gameId}
             round={currentRound}
             players={players}
-            rankings={rankings}
             guesses={roundGuesses}
             isHost={session.isHost}
+            roundLimit={gameState.round_limit}
+            cardCount={gameState.card_count}
           />
         )}
 
         {gameState && status === 'REVEAL' && (
           <ItemRevealScreen
             round={currentRound}
-            roundReveal={roundReveal}
-            revealOrder={revealOrder}
             players={players}
             rankings={rankings}
+            roundReveal={roundReveal}
+            revealOrder={revealOrder}
+            rankingRevealMode={gameState.ranking_reveal_mode}
             playerId={session.playerId}
+            isHost={session.isHost}
           />
         )}
 

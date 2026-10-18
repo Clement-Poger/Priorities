@@ -1,6 +1,7 @@
 export type GameStatus = 'LOBBY' | 'RANKING' | 'GUESSING' | 'REVEAL' | 'RESULTS' | 'FINISHED';
 
 export type AppTheme = 'nebula' | 'ocean' | 'sunset' | 'forest';
+export type RankingRevealMode = 'ALL' | 'ONE_BY_ONE';
 
 export interface Card {
   id: string;
@@ -15,6 +16,11 @@ export interface Game {
   host_id?: string;
   status: GameStatus;
   round_number: number;
+  round_limit: number;
+  card_count: number;
+  ranking_timer_seconds: number;
+  ranking_reveal_mode: RankingRevealMode;
+  ranking_started_at: string | null;
   created_at?: string;
 }
 
@@ -40,15 +46,8 @@ export interface PlayerRanking {
   id: string;
   round_id: string;
   player_id: string;
-  ranking: string[]; // Array trié des IDs de cartes de 1 à 5
+  ranking: string[];
   is_submitted: boolean;
-}
-
-export interface RoundReveal {
-  round_id: string;
-  controller_player_id: string;
-  revealed_count: number;
-  updated_at: string;
 }
 
 export interface RoundGuess {
@@ -59,8 +58,29 @@ export interface RoundGuess {
   is_submitted: boolean;
 }
 
+export interface RoundReveal {
+  round_id: string;
+  controller_player_id: string;
+  revealed_count: number;
+  updated_at: string;
+}
+
 export interface RoundRevealOrder {
   round_id: string;
   reveal_index: number;
   player_id: string;
+}
+
+export interface RoundAffinityReveal {
+  round_id: string;
+  player_id: string;
+  target_player_id: string;
+  reveal_index: number;
+  compatibility_percentage: number | null;
+}
+
+export interface RoundAffinityProgress {
+  player_revealed_count: number;
+  pairs_per_player: number;
+  all_players_complete: boolean;
 }

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { GameLobby } from '../components/GameLobby';
 import { supabase } from '../lib/supabase';
 import { useHaptics } from '../hooks/useHaptics';
-import type { Player } from '../types/database.types';
+import type { Player, RankingRevealMode } from '../types/database.types';
 import { shuffle } from '../utils/shuffle';
 import { ensureRoundWithCards } from '../utils/ensureRoundWithCards';
 
@@ -12,6 +12,11 @@ interface LobbyScreenProps {
   players: Player[];
   currentPlayerId: string;
   isHost: boolean;
+  currentRoundIndex: number;
+  roundLimit: number;
+  cardCount: number;
+  rankingTimerSeconds: number;
+  rankingRevealMode: RankingRevealMode;
   onRefresh: () => Promise<void>;
   onLobbyClosed: () => void;
 }
@@ -22,6 +27,11 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
   players,
   currentPlayerId,
   isHost,
+  currentRoundIndex,
+  roundLimit,
+  cardCount,
+  rankingTimerSeconds,
+  rankingRevealMode,
   onRefresh,
   onLobbyClosed,
 }) => {
@@ -33,7 +43,7 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const handleStartGame = async () => {
-    if (isStarting || isClosing || players.length < 2) return;
+    if (isStarting || isClosing || players.length < 2 || currentRoundIndex >= roundLimit) return;
     setIsStarting(true);
     setStartError(null);
     haptics.mediumTap();
@@ -41,16 +51,20 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
     try {
       const { data: cards, error: cardsError } = await supabase.from('cards').select('id');
       if (cardsError) throw cardsError;
-      if (!cards || cards.length < 5) {
-        throw new Error('Pas assez de cartes disponibles pour démarrer la partie.');
+      if (!cards || cards.length < cardCount) {
+        throw new Error(`Pas assez de cartes disponibles pour démarrer la partie (il en faut ${cardCount}).`);
       }
 
-      const selectedCardIds = shuffle(cards).slice(0, 5).map((card) => card.id);
-      await ensureRoundWithCards(gameId, 1, selectedCardIds);
+      const selectedCardIds = shuffle(cards).slice(0, cardCount).map((card) => card.id);
+      const nextRoundNumber = currentRoundIndex + 1;
+      await ensureRoundWithCards(gameId, nextRoundNumber, selectedCardIds, cardCount);
 
       const { data: startedGame, error: gameError } = await supabase
         .from('games')
-        .update({ status: 'RANKING', round_number: 1 })
+        .update({
+          status: 'RANKING',
+          round_number: nextRoundNumber,
+        })
         .eq('id', gameId)
         .eq('status', 'LOBBY')
         .select('id')
@@ -118,6 +132,11 @@ export const LobbyScreen: React.FC<LobbyScreenProps> = ({
       players={players}
       currentPlayerId={currentPlayerId}
       isHost={isHost}
+      canStartGame={currentRoundIndex < roundLimit}
+      roundLimit={roundLimit}
+      cardCount={cardCount}
+      rankingTimerSeconds={rankingTimerSeconds}
+      rankingRevealMode={rankingRevealMode}
       onStartGame={handleStartGame}
       onCloseLobby={handleCloseLobby}
       isStarting={isStarting}
